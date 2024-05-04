@@ -47,6 +47,27 @@ namespace API_Adresse.WebbApi.Controllers
             }
         }
 
+        [HttpGet("geocode/{address}")]
+        public async Task<ActionResult<AddressDTO>> GeocodeAddress(string address)
+        {
+            try
+            {
+                var result = await _addressService.GeocodeAddressAsync(address);
+                if (result != null)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    return NotFound("Address not found");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error geocoding address: {ex.Message}");
+            }
+        }
+
         [HttpGet("stream")]
         public async Task<IActionResult> StreamAddresses()
         {

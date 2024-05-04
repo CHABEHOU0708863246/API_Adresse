@@ -5,5 +5,7 @@ namespace API_Adresse.Services.AdressService
     public interface IAddressService
     {
         Task<List<AddressDTO>> GetAddressesAsync(string query);
+
+        Task<AddressDTO> GeocodeAddressAsync(string address);
     }
 }

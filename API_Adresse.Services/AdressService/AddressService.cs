@@ -53,5 +53,37 @@ namespace API_Adresse.Services.AdressService
 
             return addresses;
         }
+
+        public async Task<AddressDTO> GeocodeAddressAsync(string address)
+        {
+            var apiUrl = $"https://api-adresse.data.gouv.fr/search/?q={address}";
+            var response = await _httpClient.GetAsync(apiUrl);
+            response.EnsureSuccessStatusCode();
+
+            var jsonString = await response.Content.ReadAsStringAsync();
+            var jsonObject = JsonDocument.Parse(jsonString);
+            var features = jsonObject.RootElement.GetProperty("features");
+
+            if (features.GetArrayLength() > 0)
+            {
+                var firstFeature = features.EnumerateArray().FirstOrDefault();
+                var geometry = firstFeature.GetProperty("geometry");
+                var coordinates = geometry.GetProperty("coordinates");
+                var longitude = coordinates[0].GetDouble();
+                var latitude = coordinates[1].GetDouble();
+
+                return new AddressDTO
+                {
+                    Label = address,
+                    Longitude = longitude,
+                    Latitude = latitude
+                };
+            }
+            else
+            {
+                return null;
+            }
+        }
+
     }
 }
